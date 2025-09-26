@@ -10,39 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # 3️⃣ Docker build
       - name: Build Docker image
         run: docker build -t simple-backend:latest .
 
-      # 4️⃣ AWS ECR login
       - name: Login to AWS ECR
         uses: aws-actions/amazon-ecr-login@v2
-        with:
-          region: ${{ secrets.AWS_REGION }}
 
-      # 5️⃣ Push Docker image to ECR
-      - name: Push to ECR
+      - name: Push Docker image to ECR
         run: |
-          docker tag simple-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/simple-backend:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/simple-backend:latest
+          docker tag simple-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/simple-backend:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/simple-backend:latest
 
-      # 6️⃣ Helm deploy
       - name: Helm deploy
         run: |
           helm upgrade --install simple-backend ./simple-backend --atomic
 
-      # 7️⃣ Slack Notification via Webhook
-      - name: Notify Slack
+      - name: Notify Slack via Webhook
         if: always()
         run: |
           curl -X POST -H 'Content-type: application/json' \
