@@ -82,11 +82,12 @@ jobs:
             --set image.repository=$ECR_REGISTRY/$IMAGE_NAME \
             --set image.tag=latest
 
+      # Slack Notification Step — add sirf ye
       - name: Notify Slack
         if: always()
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: '#devops-alerts'  # ya tumhare Slack channel ka naam
+          channel-id: '#devops-alerts'
           slack-message: |
             🚀 Deployment Status: ${{ job.status }}
             📦 Repo: ${{ github.repository }}
@@ -94,4 +95,3 @@ jobs:
             ⚙️ Workflow: ${{ github.workflow }}
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_WEBHOOK }}
-
