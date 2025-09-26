@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline (Simplified)
 
 on:
   push:
@@ -24,22 +24,12 @@ jobs:
       - name: Build Docker image
         run: docker build -t simple-backend:latest .
 
-      # 4️⃣ AWS ECR login (fixed, no duplicate, no region input)
-      - name: Login to AWS ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      # 5️⃣ Push Docker image to ECR
-      - name: Push to ECR
-        run: |
-          docker tag simple-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/simple-backend:latest
-          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/simple-backend:latest
-
-      # 6️⃣ Helm deploy
+      # 4️⃣ Helm deploy
       - name: Helm deploy
         run: |
           helm upgrade --install simple-backend ./simple-backend --atomic
 
-      # 7️⃣ Slack Notification via Webhook
+      # 5️⃣ Slack Notification via Webhook
       - name: Notify Slack
         if: always()
         run: |
