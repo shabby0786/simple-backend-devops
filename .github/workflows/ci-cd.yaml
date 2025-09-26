@@ -14,7 +14,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Set up Node.js (agar Node backend hai)
+      # 2️⃣ Setup Node.js (agar Node backend hai)
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -24,15 +24,17 @@ jobs:
       - name: Build Docker image
         run: docker build -t simple-backend:latest .
 
-      # 4️⃣ Login to AWS ECR
+      # 4️⃣ AWS ECR login
       - name: Login to AWS ECR
         uses: aws-actions/amazon-ecr-login@v2
+        with:
+          region: ${{ secrets.AWS_REGION }}
 
       # 5️⃣ Push Docker image to ECR
       - name: Push to ECR
         run: |
-          docker tag simple-backend:latest 043309363240.dkr.ecr.us-east-1.amazonaws.com/simple-backend:latest
-          docker push 043309363240.dkr.ecr.us-east-1.amazonaws.com/simple-backend:latest
+          docker tag simple-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/simple-backend:latest
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/simple-backend:latest
 
       # 6️⃣ Helm deploy
       - name: Helm deploy
@@ -44,7 +46,7 @@ jobs:
         if: always()
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          channel-id: '#devops-alerts'  # tumhare Slack channel ka naam
+          channel-id: '#devops-alerts'  # Slack channel ka exact naam
           slack-message: |
             🚀 Deployment Status: ${{ job.status }}
             📦 Repo: ${{ github.repository }}
